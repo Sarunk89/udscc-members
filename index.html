@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List App</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        ul { list-style-type: none; padding: 0; }
+        li { padding: 10px; border: 1px solid #ccc; margin-bottom: 5px; }
+        .completed { text-decoration: line-through; }
+    </style>
+</head>
+<body>
+    <h1>To-Do List Application</h1>
+    <input type="text" id="taskInput" placeholder="Add a new task...">
+    <button id="addTaskButton">Add Task</button>
+    <ul id="taskList"></ul>
+    <script>
+        // Function to load tasks from local storage
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.forEach(task => addTaskToDOM(task.text, task.completed));
+        }
+
+        // Function to add task to DOM
+        function addTaskToDOM(taskText, isCompleted) {
+            const taskList = document.getElementById('taskList');
+            const li = document.createElement('li');
+            li.textContent = taskText;
+            if (isCompleted) {
+                li.classList.add('completed');
+            }
+            li.addEventListener('click', function() {
+                toggleTaskCompletion(li);
+            });
+            li.addEventListener('dblclick', function() {
+                deleteTask(li);
+            });
+            taskList.appendChild(li);
+        }
+
+        // Function to toggle task completion
+        function toggleTaskCompletion(taskItem) {
+            taskItem.classList.toggle('completed');
+            updateLocalStorage();
+        }
+
+        // Function to delete a task
+        function deleteTask(taskItem) {
+            taskItem.remove();
+            updateLocalStorage();
+        }
+
+        // Function to update local storage
+        function updateLocalStorage() {
+            const tasks = [];
+            const taskItems = document.querySelectorAll('#taskList li');
+            taskItems.forEach(item => {
+                tasks.push({ text: item.textContent, completed: item.classList.contains('completed') });
+            });
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Event listener for adding a new task
+        document.getElementById('addTaskButton').addEventListener('click', function() {
+            const taskInput = document.getElementById('taskInput');
+            if (taskInput.value) {
+                addTaskToDOM(taskInput.value, false);
+                taskInput.value = '';
+                updateLocalStorage();
+            }
+        });
+
+        // Load existing tasks on page load
+        loadTasks();
+    </script>
+</body>
+</html>
